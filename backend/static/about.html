@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Noam Elisha - About</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        main {
+            flex: 1;
+        }
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f2f5;
+            color: #333;
+            line-height: 1.6;
+
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        header {
+            background-size: 400% 400%;
+            animation: gradient 30s ease infinite;
+            color: #fff;
+            padding: 20px 0;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        @keyframes gradient {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        header h1 {
+            margin: 0;
+            
+            font-size: 2.5em;
+            font-weight: 700;
+        }
+
+        header h2 {
+            margin-top: 0px;
+            margin: 0;
+            padding: 0;
+        }
+
+        nav {
+            display: flex;
+            justify-content: center;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        nav a {
+            color: #3b5998;
+            text-decoration: none;
+            padding: 15px 20px;
+            font-weight: 700;
+            transition: background-color 0.3s ease;
+        }
+
+        nav a:hover {
+            background-color: #f0f2f5;
+        }
+
+        .container {
+            flex: 1;
+            padding: 20px;
+            text-align: center;
+        }
+        .about-me {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .about-me h2 {
+            margin-bottom: 20px;
+            margin-top: 0px;
+        }
+        .about-me p {
+            font-size: 18px;
+            margin-bottom: 10px;
+            text-align: justify;
+            word-wrap: break-word;
+        }
+        .profile-picture {
+            margin: 20px 0;
+        }
+        .profile-picture img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 5px solid #4285f4;
+        }
+        footer {
+            background-color: #3c424f;
+            color: #fff;
+            text-align: center;
+            padding: 1px 0;
+            /* position: fixed; */
+            width: 100%;
+            bottom: 0;
+            box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);
+            flex-shrink: 0;
+        }
+    </style>
+</head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-8H1008FDQ3"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-8H1008FDQ3');
+</script>
+<body>
+    <header>
+        <h1>Noam Elisha</h1>
+        <h2>About</h2>
+    </header>
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="blog.html">Blog</a>
+        <a href="contact.html">Contact</a>
+    </nav>
+    <div class="container">
+        <div class="about-me">
+            <h2>Hello, I'm Noam</h2>
+            <div class="profile-picture">
+                <img src="Noam_Conducting.png" alt="Me Conducting">
+            </div>
+            <div>
+                <p>I am a violinist/conductor/photographer/programmer. On the side I like to play guitar and write songs or rock/jazz-y kinds of musical doodles. I currently work as a software engineer for the NHERI SimCenter at the University of California, Berkeley, where I also went to school. I have an M.S. in Industrial Engineering and Operations Research, B.A. in Music, B.S. in Electrical Engineering and Computer Science, and a B.S. in Industrial Engineering and Operations Research .</p>
+                <p>I was born in Israel, and between ages 1 and 9 lived in Belgium before moving to California where I live today. I speak English, French, and Hebrew and I am working on learning German.</p> 
+            </div>
+        </div>
+    </div>
+    <!-- <footer>
+        <p>&copy; 2024 Noam Elisha</p>
+    </footer> -->
+    <script>
+        function getRandomColor() {
+            const letters = '0123456789ABCDEF';
+            let color = '#';
+            for (let i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
+
+        function setRandomGradient() {
+            const color1 = getRandomColor();
+            const color2 = getRandomColor();
+            const color3 = getRandomColor();
+            const color4 = getRandomColor();
+            const color5 = getRandomColor();
+            const color6 = getRandomColor();
+            const header = document.querySelector('header');
+            header.style.background = `linear-gradient(75deg, ${color1}, ${color2}, ${color3}, ${color4}, ${color5}, ${color6})`;
+            header.style.backgroundSize = '400% 400%';
+            header.style.animation = 'gradient 120s ease infinite';
+        }
+
+        document.addEventListener('DOMContentLoaded', setRandomGradient);
+    </script>
+</body>
+</html>

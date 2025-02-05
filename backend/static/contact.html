@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Noam Elisha - Contact</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f2f5;
+            color: #333;
+            line-height: 1.6;
+
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            background-size: 400% 400%;
+            animation: gradient 30s ease infinite;
+            color: #fff;
+            padding: 20px 0;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        @keyframes gradient {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            font-weight: 700;
+        }
+
+        header h2 {
+            margin: 0;
+            padding: 0;
+        }
+
+        nav {
+            display: flex;
+            justify-content: center;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        nav a {
+            color: #3b5998;
+            text-decoration: none;
+            padding: 15px 20px;
+            font-weight: 700;
+            transition: background-color 0.3s ease;
+        }
+
+        nav a:hover {
+            background-color: #f0f2f5;
+        }
+
+        .container {
+            flex: 1;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .contact-info {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .contact-info h2 {
+            margin-bottom: 20px;
+        }
+
+        .contact-info p {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .social-media {
+            margin-top: 20px;
+        }
+
+        .social-media a {
+            margin: 0 10px;
+            color: #4285f4;
+            text-decoration: none;
+            font-size: 24px;
+            transition: color 0.3s ease;
+        }
+
+        .social-media a:hover {
+            color: #0f9d58;
+        }
+
+        footer {
+            background-color: #3c424f;
+            color: #fff;
+            text-align: center;
+            padding: 1px 0;
+            /* position: fixed; */
+            width: 100%;
+            bottom: 0;
+            box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);
+            flex-shrink: 0;
+        }
+    </style>
+</head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-8H1008FDQ3"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-8H1008FDQ3');
+</script>
+<body>
+    <header>
+        <h1>Noam Elisha</h1>
+        <h2>Contact</h2>
+    </header>
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="blog.html">Blog</a>
+        <a href="contact.html">Contact</a>
+    </nav>
+    <div class="container">
+        <div class="contact-info">
+            <h2>Get in Touch</h2>
+            <p><strong>Email:</strong> Coming soon when I figure out how to not get spammed</p>
+            <div class="social-media">
+                <h2>Social Media</h2>
+                <a href="https://www.instagram.com/elisha.noam" target="_blank">Instagram</a>
+                <a href="https://www.linkedin.com/in/noam-elisha/" target="_blank">LinkedIn</a>
+            </div>
+        </div>
+    </div>
+    <!-- <footer>
+        <p>&copy; 2024 Noam Elisha</p>
+    </footer> -->
+    <script>
+        function getRandomColor() {
+            const letters = '0123456789ABCDEF';
+            let color = '#';
+            for (let i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
+
+        function setRandomGradient() {
+            const color1 = getRandomColor();
+            const color2 = getRandomColor();
+            const color3 = getRandomColor();
+            const color4 = getRandomColor();
+            const color5 = getRandomColor();
+            const color6 = getRandomColor();
+            const header = document.querySelector('header');
+            header.style.background = `linear-gradient(75deg, ${color1}, ${color2}, ${color3}, ${color4}, ${color5}, ${color6})`;
+            header.style.backgroundSize = '400% 400%';
+            header.style.animation = 'gradient 120s ease infinite';
+        }
+
+        document.addEventListener('DOMContentLoaded', setRandomGradient);
+    </script>
+</body>
+</html>
