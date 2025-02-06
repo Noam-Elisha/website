@@ -306,8 +306,17 @@ def run_server():
         print("\nShutting down server...")
         print("Server shutdown complete!")
         
-# Create the application callable for WSGI servers
-application = socketio.wsgi_app(app)
+# Create a WSGI middleware that wraps the Flask app
+def create_app(environ, start_response):
+    path_info = environ.get('PATH_INFO', '')
+    
+    if path_info.startswith('/socket.io'):
+        environ['eventlet.input'] = environ['wsgi.input']
+        return socketio.wsgi_app(environ, start_response)
+    return app(environ, start_response)
+
+# Use the middleware as the WSGI application
+application = create_app
 
 if __name__ == "__main__":
     static_path = os.path.abspath(app.static_folder)
