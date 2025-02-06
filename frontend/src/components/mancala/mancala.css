@@ -1,0 +1,64 @@
+.mancala-board {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 20px;
+    background-color: #8B4513;
+    border-radius: 15px;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.pockets-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.player-1-pockets,
+.player-2-pockets {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.pocket {
+    width: 60px;
+    height: 60px;
+    background-color: #DEB887;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    cursor: pointer;
+    border: 2px solid #8B4513;
+}
+
+.pocket:hover {
+    background-color: #D2691E;
+}
+
+.store {
+    width: 80px;
+    height: 150px;
+    background-color: #DEB887;
+    border-radius: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    border: 2px solid #8B4513;
+}
+
+.game-status {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+}
