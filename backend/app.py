@@ -307,7 +307,7 @@ def run_server():
         print("Server shutdown complete!")
         
 # Create the application callable for WSGI servers
-application = socketio.middleware(app)
+application = socketio.wsgi_app(app)
 
 if __name__ == "__main__":
     static_path = os.path.abspath(app.static_folder)
