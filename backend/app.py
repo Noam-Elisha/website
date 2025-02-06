@@ -12,7 +12,11 @@ app = Flask(__name__, static_folder='static', static_url_path='')
 CORS(app)
 socketio = SocketIO(app, 
     async_mode='eventlet',
-    cors_allowed_origins=["http://localhost:3000", "http://localhost:5000", "https://noamelisha.com"]
+    cors_allowed_origins=["http://localhost:3000", "http://localhost:5000", "https://noamelisha.com"],
+    path='/socket.io',  # Explicitly set the Socket.IO path
+    message_queue='redis://',  # Use Redis for message queueing if available, or remove if not
+    engineio_logger=True,  # Enable Engine.IO logging
+    logger=True  # Enable Socket.IO logging
 )
 
 # Store active games
@@ -302,6 +306,9 @@ def run_server():
         print("\nShutting down server...")
         print("Server shutdown complete!")
         
+# Create the application callable for WSGI servers
+application = socketio.middleware(app)
+
 if __name__ == "__main__":
     static_path = os.path.abspath(app.static_folder)
     print(f"Starting server with static folder: {static_path}")
