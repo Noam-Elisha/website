@@ -1,3 +1,6 @@
+import eventlet
+eventlet.monkey_patch()  # This needs to be at the very top of your file
+
 from flask import Flask, request, jsonify, send_from_directory, send_file
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit, join_room, leave_room
@@ -8,6 +11,7 @@ import time
 app = Flask(__name__, static_folder='static', static_url_path='')
 CORS(app)
 socketio = SocketIO(app, 
+    async_mode='eventlet',
     cors_allowed_origins=["http://localhost:3000", "http://localhost:5000", "https://noamelisha.com"]
 )
 
@@ -303,4 +307,8 @@ if __name__ == "__main__":
     print(f"Starting server with static folder: {static_path}")
     print(f"Index.html exists: {os.path.exists(os.path.join(static_path, 'index.html'))}")
     print(f"Available files in static folder: {os.listdir(static_path)}")
-    socketio.run(app, debug=True)
+    socketio.run(app, 
+                host='0.0.0.0',
+                port=5000,
+                debug=False,  # Set to False in production
+                use_reloader=False)  # Set to False in production
