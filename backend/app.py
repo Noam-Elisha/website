@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, send_from_directory
+from flask import Flask, request, jsonify, send_from_directory, send_file
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit, join_room, leave_room
 import random
@@ -14,38 +14,87 @@ socketio = SocketIO(app,
 # Store active games
 games = {}
 
-# Only have one route for home
-@app.route('/')
-def serve_home():
-    return send_from_directory(app.static_folder, 'index.html')
+# Debug middleware to log all requests
+@app.before_request
+def before_request():
+    print(f"Incoming request: {request.method} {request.path}")
+    print(f"Request URL: {request.url}")
+    print(f"Request base URL: {request.base_url}")
 
-# Serve static about page
-@app.route('/about')
-def serve_about():
-    return send_from_directory(app.static_folder, 'about.html')
-
-# Serve static blog page
-@app.route('/blog')
-def serve_blog():
-    return send_from_directory(app.static_folder, 'blog.html')
-
-# Serve static contact page
-@app.route('/contact')
-def serve_contact():
-    return send_from_directory(app.static_folder, 'contact.html')
-
-# Static files route
+# Serve static files from the nested static directory (for React app)
 @app.route('/static/<path:filename>')
 def serve_static(filename):
-    return send_from_directory(app.static_folder + '/connect4/static', filename)
+    print(f"Serving static file from nested static: {filename}")
+    try:
+        return send_from_directory(os.path.join(app.static_folder, 'static'), filename)
+    except Exception as e:
+        print(f"Error serving static file: {e}")
+        return str(e), 404
 
-# Connect4 routes
-@app.route('/connect4', defaults={'path': ''})
-@app.route('/connect4/<path:path>')
-def serve_connect4(path):
-    if path != "" and os.path.exists(app.static_folder + '/connect4/' + path):
-        return send_from_directory(app.static_folder + '/connect4', path)
-    return send_from_directory(app.static_folder + '/connect4', 'index.html')
+# Serve personal static assets
+@app.route('/personal/static/<path:filename>')
+def serve_personal_static(filename):
+    print(f"Serving personal static file: {filename}")
+    try:
+        return send_from_directory(os.path.join(app.static_folder, 'personal', 'static'), filename)
+    except Exception as e:
+        print(f"Error serving personal static file: {e}")
+        return str(e), 404
+
+# Personal static routes
+@app.route('/about')
+def serve_about():
+    return send_file(os.path.join(app.static_folder, 'personal', 'about.html'))
+
+@app.route('/about/')
+def serve_about_slash():
+    return send_file(os.path.join(app.static_folder, 'personal', 'about.html'))
+
+@app.route('/contact')
+@app.route('/contact/')
+def serve_contact():
+    return send_file(os.path.join(app.static_folder, 'personal', 'contact.html'))
+
+@app.route('/blog')
+@app.route('/blog/')
+def serve_blog():
+    return send_file(os.path.join(app.static_folder, 'personal', 'blog.html'))
+
+# Root path - serve personal index
+@app.route('/')
+def serve_root():
+    print("Serving root path")
+    try:
+        return send_file(os.path.join(app.static_folder, 'personal', 'home.html'))
+    except:
+        return send_file(os.path.join(app.static_folder, 'index.html'))
+
+# Explicit routes for the games
+@app.route('/connect4')
+@app.route('/connect4/')
+@app.route('/mancala')
+@app.route('/mancala/')
+def serve_game():
+    print(f"Serving game route: {request.path}")
+    return send_file(os.path.join(app.static_folder, 'index.html'))
+
+# Catch remaining static files
+@app.route('/<path:filename>')
+def serve_remaining(filename):
+    print(f"Trying to serve: {filename}")
+    try:
+        # First check if it's a personal static file
+        personal_path = os.path.join(app.static_folder, 'personal', filename)
+        if os.path.exists(personal_path):
+            return send_file(personal_path)
+        # Then check root static folder
+        if os.path.exists(os.path.join(app.static_folder, filename)):
+            return send_file(os.path.join(app.static_folder, filename))
+        # If neither, serve React app index.html for client-side routing
+        return send_file(os.path.join(app.static_folder, 'index.html'))
+    except Exception as e:
+        print(f"Error serving file {filename}: {e}")
+        return str(e), 404
 
 def check_winner(board, row, col, player):
     def check_direction(row, col, row_delta, col_delta):
@@ -250,4 +299,8 @@ def run_server():
         print("Server shutdown complete!")
         
 if __name__ == "__main__":
+    static_path = os.path.abspath(app.static_folder)
+    print(f"Starting server with static folder: {static_path}")
+    print(f"Index.html exists: {os.path.exists(os.path.join(static_path, 'index.html'))}")
+    print(f"Available files in static folder: {os.listdir(static_path)}")
     socketio.run(app, debug=True)

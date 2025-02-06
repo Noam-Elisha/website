@@ -3,9 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Noam Elisha - Contact</title>
+    <title>Noam Elisha - About</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
+        main {
+            flex: 1;
+        }
         body {
             font-family: 'Roboto', sans-serif;
             margin: 0;
@@ -18,7 +21,6 @@
             flex-direction: column;
             min-height: 100vh;
         }
-
         header {
             background-size: 400% 400%;
             animation: gradient 30s ease infinite;
@@ -42,11 +44,13 @@
 
         header h1 {
             margin: 0;
+            
             font-size: 2.5em;
             font-weight: 700;
         }
 
         header h2 {
+            margin-top: 0px;
             margin: 0;
             padding: 0;
         }
@@ -75,37 +79,29 @@
             padding: 20px;
             text-align: center;
         }
-
-        .contact-info {
-            max-width: 600px;
+        .about-me {
+            max-width: 800px;
             margin: 0 auto;
         }
-
-        .contact-info h2 {
+        .about-me h2 {
             margin-bottom: 20px;
+            margin-top: 0px;
         }
-
-        .contact-info p {
+        .about-me p {
             font-size: 18px;
             margin-bottom: 10px;
+            text-align: justify;
+            word-wrap: break-word;
         }
-
-        .social-media {
-            margin-top: 20px;
+        .profile-picture {
+            margin: 20px 0;
         }
-
-        .social-media a {
-            margin: 0 10px;
-            color: #4285f4;
-            text-decoration: none;
-            font-size: 24px;
-            transition: color 0.3s ease;
+        .profile-picture img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 5px solid #4285f4;
         }
-
-        .social-media a:hover {
-            color: #0f9d58;
-        }
-
         footer {
             background-color: #3c424f;
             color: #fff;
@@ -131,22 +127,23 @@
 <body>
     <header>
         <h1>Noam Elisha</h1>
-        <h2>Contact</h2>
+        <h2>About</h2>
     </header>
     <nav>
-        <a href="index.html">Home</a>
-        <a href="about.html">About</a>
-        <a href="blog.html">Blog</a>
-        <a href="contact.html">Contact</a>
+        <a href="/">Home</a>
+        <a href="/about">About</a>
+        <a href="/blog">Blog</a>
+        <a href="/contact">Contact</a>
     </nav>
     <div class="container">
-        <div class="contact-info">
-            <h2>Get in Touch</h2>
-            <p><strong>Email:</strong> Coming soon when I figure out how to not get spammed</p>
-            <div class="social-media">
-                <h2>Social Media</h2>
-                <a href="https://www.instagram.com/elisha.noam" target="_blank">Instagram</a>
-                <a href="https://www.linkedin.com/in/noam-elisha/" target="_blank">LinkedIn</a>
+        <div class="about-me">
+            <h2>Hello, I'm Noam</h2>
+            <div class="profile-picture">
+                <img src="/personal/Noam_Conducting.png" alt="Me Conducting">
+            </div>
+            <div>
+                <p>I am a violinist/conductor/photographer/programmer. On the side I like to play guitar and write songs or rock/jazz-y kinds of musical doodles. I currently work as a software engineer for the NHERI SimCenter at the University of California, Berkeley, where I also went to school. I have an M.S. in Industrial Engineering and Operations Research, B.A. in Music, B.S. in Electrical Engineering and Computer Science, and a B.S. in Industrial Engineering and Operations Research .</p>
+                <p>I was born in Israel, and between ages 1 and 9 lived in Belgium before moving to California where I live today. I speak English, French, and Hebrew and I am working on learning German.</p> 
             </div>
         </div>
     </div>
