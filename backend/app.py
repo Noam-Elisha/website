@@ -39,23 +39,20 @@ def serve_static(filename):
         print(f"Error serving static file: {e}")
         return str(e), 404
 
-# Serve personal static assets
-@app.route('/personal/static/<path:filename>')
-def serve_personal_static(filename):
-    print(f"Serving personal static file: {filename}")
-    try:
-        return send_from_directory(os.path.join(app.static_folder, 'personal', 'static'), filename)
-    except Exception as e:
-        print(f"Error serving personal static file: {e}")
-        return str(e), 404
+# # Serve personal static assets
+# @app.route('/personal/static/<path:filename>')
+# def serve_personal_static(filename):
+#     print(f"Serving personal static file: {filename}")
+#     try:
+#         return send_from_directory(os.path.join(app.static_folder, 'personal', 'static'), filename)
+#     except Exception as e:
+#         print(f"Error serving personal static file: {e}")
+#         return str(e), 404
 
 # Personal static routes
 @app.route('/about')
-def serve_about():
-    return send_file(os.path.join(app.static_folder, 'personal', 'about.html'))
-
 @app.route('/about/')
-def serve_about_slash():
+def serve_about():
     return send_file(os.path.join(app.static_folder, 'personal', 'about.html'))
 
 @app.route('/contact')
@@ -70,7 +67,7 @@ def serve_blog():
 
 @app.route('/dnd-battle-tracker')
 @app.route('/dnd-battle-tracker/')
-def serve_blog():
+def serve_dnd_tracker():
     return send_file(os.path.join(app.static_folder, 'personal', 'dnd-tracker.html'))
 
 # Root path - serve personal index
