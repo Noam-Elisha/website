@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Character Initiative Tracker</title>
+    <style>
+        :root {
+            /* Primary Colors */
+            --color-background-dark: #2c2019;
+            --color-background-darker: #241812;
+            --color-background-light: #3a2820;
+            --color-background-lighter: #4a332a;
+            
+            /* Text Colors */
+            --color-text-light: #e8d5b5;
+            --color-text-dark: #2c2019;
+            --color-text-filled: #cd8c50;
+            
+            /* Accent Colors */
+            --color-accent: #8b4513;
+            --color-accent-light: #a0522d;
+            --color-accent-lighter: #cd8c50;
+            
+            /* Transparency Colors */
+            --color-transparent-dark: rgba(44, 32, 25, 0.9);
+            --color-transparent-darker: rgba(44, 32, 25, 0.95);
+            --color-transparent-accent: rgba(139, 69, 19, 0.3);
+            --color-transparent-accent-hover: rgba(139, 69, 19, 0.5);
+            --color-transparent-shadow: rgba(139, 69, 19, 0.2);
+            --color-form-background: rgba(232, 213, 181, 0.05);
+            
+            /* Input Colors */
+            --color-input-focus: #e8d5b5;
+            --color-placeholder-focus: #2c2019;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            background: linear-gradient(135deg, var(--color-background-dark) 0%, var(--color-background-light) 100%);
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.5em;
+            color: var(--color-text-light);
+            margin: 15px 0 20px 0;
+        }
+        form {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        input {
+            width: 35%;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        textarea {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+            border: 2px solid var(--color-transparent-accent);
+            border-radius: 8px;
+            font-size: 16px;
+            transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+            background: var(--color-transparent-dark);
+            color: var(--color-text-dark);
+            resize: vertical;
+        }
+
+        input[type="text"]:hover,
+        input[type="number"]:hover,
+        textarea:hover {
+            background: var(--color-transparent-darker);
+            border-color: var(--color-transparent-accent-hover);
+        }
+
+        /* Combined all focus states into one rule */
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        textarea:focus,
+        input[type="text"]:focus:placeholder-shown,
+        input[type="number"]:focus:placeholder-shown,
+        textarea:focus:placeholder-shown,
+        input[type="text"]:focus:not(:placeholder-shown),
+        input[type="number"]:focus:not(:placeholder-shown),
+        textarea:focus:not(:placeholder-shown) {
+            background: var(--color-input-focus);
+            color: var(--color-text-dark);
+            border-color: var(--color-accent);
+            box-shadow: 0 0 0 3px var(--color-transparent-shadow);
+        }
+
+        input[type="text"]:not(:placeholder-shown),
+        input[type="number"]:not(:placeholder-shown),
+        textarea:not(:placeholder-shown) {
+            color: var(--color-text-filled);
+        }
+
+        input[type="submit"] {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--color-accent);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+
+        input[type="submit"]:hover {
+            background-color: var(--color-accent-light);
+        }
+        ul {
+            list-style-type: none;
+            padding: 25px;
+            padding-right: 25px;
+            overflow-y: auto; 
+            height: calc(100vh - 80px);
+            margin: 0;
+            background-color: transparent;
+        }
+        .fade-in {
+            animation: fadeIn .5s ease forwards; /* Adjust the duration and timing function as needed */
+            opacity: 0; /* Start with opacity 0 */
+        }
+
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+        @keyframes fadeOut {
+            0% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+        .fade-out {
+            animation: fadeOut 0.3s ease forwards; /* Adjust the duration and timing function as needed */
+        }
+        li {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 5px;
+            position: relative;
+            cursor: pointer;
+            
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--color-transparent-dark);
+            opacity: 0;
+            transition: opacity 0.09s ease-in-out;
+            overflow: hidden;
+        }
+
+        .modal.show {
+            display: block;
+            opacity: 1;
+        }
+
+        .modal-content {
+            position: relative;
+            background: linear-gradient(180deg, var(--color-background-light) 0%, var(--color-background-dark) 100%);
+            margin: 10% auto;
+            padding: 25px;
+            border: 1px solid var(--color-transparent-accent);
+            border-radius: 16px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            color: var(--color-text-light);
+            overflow-y: auto;
+            max-height: 80vh;
+        }
+
+        .modal.show .modal-content {
+            opacity: 1;
+        }
+
+        .modalp {
+            margin-bottom: 4px;
+            margin-top: 1px;
+        }
+
+        .close, .delete {
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: var(--color-background-dark);
+            border: 1px solid var(--color-transparent-accent);
+            color: var(--color-text-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 20px;
+            line-height: 0;
+            transition: background-color 0.2s ease;
+            padding: 0;
+            opacity: 0.8;
+            font-family: Arial, sans-serif;
+        }
+
+        .close::after, .delete::after {
+            content: "×";
+            position: relative;
+            top: 1px;
+        }
+
+        .close:hover, .delete:hover {
+            background: var(--color-accent);
+            opacity: 1;
+        }
+
+        /* Specific positioning for modal close button */
+        .close {
+            right: 15px;
+            top: 15px;
+        }
+
+        /* Specific positioning for character card delete button */
+        .delete {
+            right: 10px;
+            top: 10px;
+        }
+
+        /* Style modal title */
+        .modal-content h2 {
+            color: var(--color-text-light);
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+        }
+        .character {
+            background: linear-gradient(180deg, var(--color-background-light) 0%, var(--color-background-dark) 100%);
+            border-radius: 16px;
+            border: none;
+            box-shadow: 
+                0 2px 4px rgba(0,0,0,0.1),
+                0 4px 8px rgba(0,0,0,0.1);
+            margin-bottom: 16px;
+            transition: all 0.3s ease;
+            color: var(--color-text-light);
+            position: relative;
+            overflow: hidden;
+            padding: 5px;
+        }
+
+        /* Replace the border-left with a pseudo-element */
+        .character::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 8px;  /* Offset from top */
+            bottom: 8px;  /* Offset from bottom */
+            width: 3px;
+            border-radius: 2px;
+            background: linear-gradient(to bottom, var(--color-accent-lighter), var(--color-accent));
+        }
+
+        /* Adjust the accent colors for each card */
+        .character:nth-child(3n)::after {
+            background: linear-gradient(to bottom, var(--color-accent-lighter), var(--color-accent));
+        }
+
+        .character:nth-child(3n+1)::after {
+            background: linear-gradient(to bottom, var(--color-accent-lighter), var(--color-accent));
+        }
+
+        .character:nth-child(3n+2)::after {
+            background: linear-gradient(to bottom, var(--color-accent-lighter), var(--color-accent));
+        }
+
+        /* Remove the old border styles */
+        .character:nth-child(3n),
+        .character:nth-child(3n+1),
+        .character:nth-child(3n+2) {
+            border-left: none;
+        }
+
+        .character:hover {
+            transform: translateY(-2px) translateX(2px);
+            box-shadow: 
+                0 4px 12px rgba(0,0,0,0.05),
+                0 8px 16px rgba(0,0,0,0.05);
+            background: linear-gradient(180deg, var(--color-background-lighter) 0%, var(--color-background-light) 100%);
+        }
+        .details {
+            display: flex;
+            font-size: 1.15em;
+            padding: 20px 25px;
+            gap: 30px;
+            align-items: flex-start;
+        }
+        .details > div:first-child {
+            flex: 35%;
+        }
+        .details > div:last-child {
+            flex: 65%;
+            padding-right: 40px;
+        }
+        .details p {
+            margin: 6px 0;
+            line-height: 1.6;
+            letter-spacing: 0.2px;
+            color: var(--color-text-light);
+        }
+        .cname {
+            font-size: 1.8em !important;
+            margin-bottom: 12px;
+            color: var(--color-text-light);
+            font-weight: 600;
+            letter-spacing: -0.3px;
+        }
+        h2#chars {
+            border-bottom: none;
+            background-color: transparent;
+            color: var(--color-text-light);
+            font-size: 1.8em;
+            margin: 0;
+            padding: 15px;
+            position: relative;
+            padding-bottom: 10px;
+        }
+        h2#chars::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 15px;
+            right: 15px;
+            height: 2px;
+            background: linear-gradient(90deg, 
+                rgba(205, 140, 80, 0) 0%, 
+                rgba(205, 140, 80, 0.5) 50%, 
+                rgba(205, 140, 80, 0) 100%);
+        }
+        /* Left panel styling */
+        div[style*="width: 40%"] {
+            background: linear-gradient(180deg, var(--color-background-dark) 0%, var(--color-background-darker) 100%);
+            box-shadow: 2px 0 10px rgba(0,0,0,0.2);
+            padding: 20px;
+            border-right: 1px solid var(--color-transparent-accent);
+            position: relative;
+            overflow-y: auto;
+            height: 100vh;
+        }
+        /* Add subtle pattern to left panel */
+        div[style*="width: 40%"]::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 200px;
+            background: linear-gradient(135deg, 
+                rgba(66, 153, 225, 0.05) 0%, 
+                rgba(99, 179, 237, 0.05) 100%);
+            border-bottom-right-radius: 50%;
+            border-bottom-left-radius: 50%;
+        }
+        /* Add bottom decoration */
+        div[style*="width: 40%"]::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 150px;
+            background: linear-gradient(135deg, 
+                rgba(66, 153, 225, 0.03) 0%, 
+                rgba(99, 179, 237, 0.03) 100%);
+            border-top-right-radius: 50%;
+            border-top-left-radius: 50%;
+        }
+        /* Form container */
+        #characterForm {
+            position: relative;
+            z-index: 1;
+            background: var(--color-form-background);
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 
+                0 4px 6px rgba(0, 0, 0, 0.05),
+                0 1px 3px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--color-transparent-accent);
+        }
+        h1 {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            font-size: 2.5em;
+            color: var(--color-text-light);
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+        }
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(90deg, 
+                rgba(205, 140, 80, 0) 0%, 
+                rgba(205, 140, 80, 0.5) 50%, 
+                rgba(205, 140, 80, 0) 100%);
+        }
+        input[type="text"],
+        input[type="number"],
+        textarea {
+            background: var(--color-transparent-dark);
+            border: 2px solid var(--color-transparent-accent);
+            transition: all 0.3s ease;
+        }
+        input[type="text"]:hover,
+        input[type="number"]:hover,
+        textarea:hover {
+            background: var(--color-transparent-darker);
+            border-color: var(--color-transparent-accent-hover);
+        }
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        textarea:focus {
+            background: #ffffff;
+            border-color: var(--color-accent);
+            box-shadow: 0 0 0 3px var(--color-transparent-shadow);
+        }
+        /* Right panel styling */
+        div[style*="width: 60%"] {
+            background: linear-gradient(135deg, var(--color-background-dark) 0%, var(--color-background-light) 100%);
+            height: 100vh;
+            overflow-y: hidden;
+        }
+        /* Add placeholder color */
+        ::placeholder {
+            color: var(--color-text-light);
+        }
+        /* Style for strong tags */
+        strong {
+            color: var(--color-accent-lighter);
+            font-weight: 600;
+        }
+        input[type="text"]:focus::placeholder,
+        input[type="number"]:focus::placeholder,
+        textarea:focus::placeholder {
+            color: var(--color-placeholder-focus);
+        }
+        #editForm {
+            overflow: visible;
+        }
+        #editNotes {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+            border: 2px solid var(--color-transparent-accent);
+            border-radius: 8px;
+            font-size: 16px;
+            background: var(--color-transparent-dark);
+            color: var(--color-text-filled);
+            resize: vertical;
+            transition: none !important;
+            animation: none !important;
+            will-change: height;
+        }
+
+        #editNotes:hover {
+            background: var(--color-transparent-darker);
+            border-color: var(--color-transparent-accent-hover);
+        }
+
+        #editNotes:focus {
+            background: var(--color-input-focus);
+            color: var(--color-text-dark);
+            border-color: var(--color-accent);
+            box-shadow: 0 0 0 3px var(--color-transparent-shadow);
+        }
+        #notes {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+            border: 2px solid var(--color-transparent-accent);
+            border-radius: 8px;
+            font-size: 16px;
+            background: var(--color-transparent-dark);
+            color: var(--color-text-dark);
+            resize: vertical;
+            transition: none !important;
+            animation: none !important;
+            will-change: height;
+        }
+
+        #notes:hover {
+            background: var(--color-transparent-darker);
+            border-color: var(--color-transparent-accent-hover);
+        }
+
+        #notes:focus {
+            background: var(--color-input-focus);
+            border-color: var(--color-accent);
+            box-shadow: 0 0 0 3px var(--color-transparent-shadow);
+        }
+
+        /* Add these media queries at the end of your existing styles */
+        @media screen and (max-width: 768px) {
+            body {
+                flex-direction: column;
+            }
+
+            div[style*="width: 40%"],
+            div[style*="width: 60%"] {
+                width: 100% !important;
+                float: none;
+            }
+
+            div[style*="width: 40%"] {
+                min-height: min-content;  /* Ensure content is visible */
+                max-height: 50%;         /* Don't take more than half */
+                overflow-y: auto;
+                border-bottom: 1px solid var(--color-transparent-accent);
+                padding-bottom: 10px;
+            }
+
+            div[style*="width: 60%"] {
+                height: calc(100% - min(50%, 400px)); /* Take remaining space, but ensure form has enough room */
+                overflow-y: hidden;
+                padding-top: 10px;
+            }
+
+            ul {
+                height: calc(100% - 50px);  /* Adjust for header */
+                overflow-y: auto;
+            }
+
+            h2#chars {
+                margin-top: 0;
+            }
+
+            h1 {
+                font-size: 1.5em;  /* Smaller font */
+                margin: 5px 0;     /* Reduced margin */
+            }
+
+            #characterForm {
+                padding: 5px;  /* Reduced padding */
+            }
+
+            .character {
+                margin: 5px 0;  /* Reduced margin */
+            }
+
+            .details {
+                padding: 5px;  /* Reduced padding */
+                gap: 5px;      /* Reduced gap */
+                font-size: 1em;  /* Smaller font */
+            }
+
+            input[type="text"],
+            input[type="number"],
+            textarea {
+                padding: 6px;  /* Reduced padding */
+                margin-bottom: 5px;  /* Reduced margin */
+                font-size: 14px;  /* Smaller font */
+            }
+
+            .cname {
+                font-size: 1.2em !important;  /* Smaller font */
+                margin-bottom: 5px;  /* Reduced margin */
+            }
+
+            #notes, #editNotes {
+                max-height: 60px;  /* Limit textarea height */
+            }
+        }
+
+        @media screen and (max-width: 480px) {
+            div[style*="width: 40%"] {
+                max-height: 35vh;  /* Further reduced */
+            }
+
+            div[style*="width: 60%"] {
+                height: 65vh;  /* Increased */
+            }
+
+            ul {
+                height: calc(65vh - 40px);
+            }
+
+            h1 {
+                font-size: 1.3em;  /* Even smaller font */
+            }
+
+            .details {
+                padding: 5px;
+                flex-direction: column;  /* Stack content vertically */
+                gap: 2px;
+            }
+
+            .details > div:first-child,
+            .details > div:last-child {
+                flex: 100%;  /* Take full width */
+                padding-right: 0;
+            }
+
+            input[type="submit"] {
+                padding: 8px;  /* Reduced padding */
+                font-size: 14px;  /* Smaller font */
+            }
+        }
+    </style>
+</head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-8H1008FDQ3"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-8H1008FDQ3');
+</script>
+<body>
+    <div style="width: 40%; float:left; overflow:hidden;">
+        <h1>Character Initiative Tracker</h1>
+        <form id="characterForm">
+            <input type="text" id="name" placeholder="Name" required>
+            <input type="number" id="health" placeholder="Health" required>
+            <input type="number" id="initiative" placeholder="Initiative" required>
+            <textarea id="notes" placeholder="Notes (optional)" rows="3"></textarea>
+            <input type="submit" value="Add Character">
+        </form>
+     </div>
+     <div style="width: 60%; float:right; overflow:hidden">
+        <h2 id="chars">Character List</h2>
+        <ul id="characterList"></ul>
+     </div>
+
+    <div id="myModal" class="modal">
+    <div class="modal-content">
+        <span class="close"></span>
+        <h2>Edit Character</h2>
+        <form id="editForm">
+            <p class="modalp">Name:</p>
+            <input type="text" id="editName" placeholder="Name" required>
+            <p class="modalp">Health:</p>
+            <input type="number" id="editHealth" placeholder="Health" required>
+            <p class="modalp">Initiative:</p>
+            <input type="number" id="editInitiative" placeholder="Initiative" required>
+            <p class="modalp">Notes:</p>
+            <textarea id="editNotes" placeholder="Notes (optional)" rows="3"></textarea>
+            <input type="submit" value="Save Changes">
+        </form>
+    </div>
+</div>
+
+    <script>
+        var modal = document.getElementById("myModal");
+        var editForm = document.getElementById("editForm");
+        var editNameInput = document.getElementById("editName");
+        var editHealthInput = document.getElementById("editHealth");
+        var editInitiativeInput = document.getElementById("editInitiative");
+        var editNotesInput = document.getElementById("editNotes");
+        var MODAL_TRANSITION_TIME = 100;
+    
+        var span = document.getElementsByClassName("close")[0];
+        span.onclick = function() {
+            modal.classList.remove("show");
+            setTimeout(function() {
+                modal.style.display = "none";
+            }, MODAL_TRANSITION_TIME);
+        }
+
+        // Track where the click started
+        let clickStartedOutsideModal = false;
+
+        window.addEventListener("mousedown", function(event) {
+            clickStartedOutsideModal = event.target === modal;
+        });
+
+        window.addEventListener("click", function(event) {
+            if (event.target === modal && clickStartedOutsideModal) {
+                modal.classList.remove("show");
+                setTimeout(function() {
+                    modal.style.display = "none";
+                }, MODAL_TRANSITION_TIME);
+            }
+        });
+    
+        document.getElementById("characterForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+            addCharacter();
+        });
+    
+        function addCharacter() {
+            var name = document.getElementById("name").value;
+            var health = document.getElementById("health").value;
+            var initiative = document.getElementById("initiative").value;
+            var notes = document.getElementById("notes").value;
+
+            var characterList = document.getElementById("characterList");
+
+            var characterDiv = document.createElement("li");
+            characterDiv.classList.add("character", "fade-in");
+
+            characterDiv.innerHTML = `
+                <span class="delete"></span>
+                <div class="details" style="display:flex; font-size:1.15em;">
+                    <div style="flex:50%;">
+                        <h2 class="cname" style="font-size:2.5em; padding-right:5%;">${name}:</h2>
+                        <p><strong class="chealth">Health:</strong> ${health}</p>
+                        <p><strong class="cinitiative">Initiative:</strong> ${initiative}</p>
+                    </div>
+                    <div style="flex:50%">
+                        <p><strong class="cnotes">Notes:</strong><br><span style="white-space: pre-wrap;">${notes}</span></p>
+                    </div>
+                </div>
+            `;
+            
+            characterList.insertBefore(characterDiv, characterList.firstChild);
+
+            characterDiv.addEventListener("click", function() {
+                openModal(name, health, initiative, notes, characterDiv);
+            });
+            
+            characterDiv.querySelector(".delete").addEventListener("click", function(event) {
+                deleteCharacter(characterDiv, event);
+            });
+            
+            // Clear input fields after adding the character
+            document.getElementById("name").value = "";
+            document.getElementById("health").value = "";
+            document.getElementById("initiative").value = "";
+            document.getElementById("notes").value = "";
+
+            sortList();
+            setTimeout(function() {
+                characterDiv.classList.remove("fade-in");
+            }, 300); // Adjust the delay as needed
+        }
+
+        function deleteCharacter(characterDiv, event) {
+            // Prevent event bubbling
+            event.stopPropagation();
+
+            // Set opacity to 0 to trigger fade-out effect
+            characterDiv.classList.add("fade-out");
+            // Remove the characterDiv after the fade-out effect completes
+            characterDiv.addEventListener("animationend", function() {
+                // Remove the characterDiv from the DOM
+                characterDiv.parentNode.removeChild(characterDiv);
+            });
+        }
+    
+        function openModal(name, health, initiative, notes, characterDiv) {
+            modal.style.display = "block";
+            setTimeout(function() {
+                modal.classList.add("show");
+            }, MODAL_TRANSITION_TIME);
+
+            // Get all the values first
+            let nameText = characterDiv.querySelector(".cname").textContent.slice(0, -1);
+            let healthText = characterDiv.querySelector(".chealth").nextSibling.textContent.trim();
+            let initiativeText = characterDiv.querySelector(".cinitiative").nextSibling.textContent.trim();
+            let notesText = characterDiv.querySelector(".cnotes").parentElement.querySelector("span").textContent;
+
+            // Set the values with a small delay to ensure modal is ready
+            setTimeout(() => {
+                editNameInput.value = nameText;
+                editHealthInput.value = healthText;
+                editInitiativeInput.value = initiativeText;
+                editNotesInput.value = notesText;
+            }, 0);
+
+            editForm.onsubmit = function(event) {
+                event.preventDefault();
+
+                name = editNameInput.value;
+                health = editHealthInput.value;
+                initiative = editInitiativeInput.value;
+                notes = editNotesInput.value;
+
+                // Update the character's details in the characterDiv
+                characterDiv.querySelector("h2").innerText = name + ":";
+                var details = characterDiv.querySelector(".details");
+                details.querySelectorAll("p")[0].innerHTML = "<strong class='chealth'>Health:</strong> " + health;
+                details.querySelectorAll("p")[1].innerHTML = "<strong class='cinitiative'>Initiative:</strong> " + initiative;
+                details.querySelectorAll("p")[2].innerHTML = "<strong class='cnotes'>Notes:</strong><br><span style='white-space: pre-wrap;'>" + notes + "</span>";
+
+                modal.classList.remove("show");
+                setTimeout(function() {
+                    modal.style.display = "none";
+                }, MODAL_TRANSITION_TIME);
+                sortList();
+            };
+        }
+
+        
+
+        function sortList() {
+            var characterList = document.getElementById("characterList");
+            var characters = Array.from(characterList.querySelectorAll('.character'));
+
+            characters.sort(function(a, b) {
+                var initiativeA = parseInt(a.querySelector('.details').querySelectorAll('p')[1].innerText.split(":")[1].trim());
+                var initiativeB = parseInt(b.querySelector('.details').querySelectorAll('p')[1].innerText.split(":")[1].trim());
+                
+                // If initiatives are equal, sort by name
+                if (initiativeB === initiativeA) {
+                    var nameA = a.querySelector('.cname').innerText.slice(0, -1).toLowerCase();
+                    var nameB = b.querySelector('.cname').innerText.slice(0, -1).toLowerCase();
+                    return nameA.localeCompare(nameB);
+                }
+                
+                return initiativeB - initiativeA;
+            });
+
+            characterList.innerHTML = ""; // Clear the list
+
+            characters.forEach(function(character) {
+                characterList.appendChild(character);
+            });
+        }
+    </script>
+    
+</body>
+</html>

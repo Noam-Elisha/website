@@ -1,11 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { io } from 'socket.io-client';
 import './Connect4.css';
-
-const socket = io(window.location.hostname === 'localhost' ? 'http://localhost:5000' : window.location.origin, {
-  path: '/socket.io',
-  transports: ['websocket']
-});
 
 function Connect4() {
   const [board, setBoard] = useState(Array(6).fill().map(() => Array(7).fill(null)));
@@ -14,104 +8,140 @@ function Connect4() {
   const [gameId, setGameId] = useState(null);
   const [playerNumber, setPlayerNumber] = useState(null);
   const [winningCells, setWinningCells] = useState([]);
-  const [gameStatus, setGameStatus] = useState('waiting'); // 'waiting', 'playing', 'spectating'
+  const [gameStatus, setGameStatus] = useState('waiting');
   const [joinGameId, setJoinGameId] = useState('');
-  const [showButtons, setShowButtons] = useState(false);
+  const [eventSource, setEventSource] = useState(null);
 
+  // Set up SSE connection when game is created/joined
   useEffect(() => {
-    socket.on('game_created', (data) => {
+    if (gameId && !winner) {
+      console.log('Setting up event source for game:', gameId);
+      const newEventSource = new EventSource(`/api/game/${gameId}/events`);
+      
+      newEventSource.onopen = () => {
+        console.log('SSE connection opened successfully');
+      };
+      
+      newEventSource.onmessage = (event) => {
+        console.log('Raw SSE event received:', event);
+        const data = JSON.parse(event.data);
+        console.log('Parsed game update:', data);
+        
+        if (data.error) {
+          console.error('Game error:', data.error);
+          newEventSource.close();
+          return;
+        }
+
+        setBoard(data.board);
+        setCurrentPlayer(data.current_player);
+        
+        if (data.players_count === 2 && gameStatus === 'waiting') {
+          console.log('Second player joined, updating game status');
+          setGameStatus('playing');
+        }
+      };
+
+      newEventSource.onerror = (error) => {
+        console.error('SSE error:', error);
+        console.error('SSE readyState:', newEventSource.readyState);
+        newEventSource.close();
+      };
+
+      setEventSource(newEventSource);
+
+      return () => {
+        console.log('Cleaning up event source');
+        newEventSource.close();
+        setEventSource(null);
+      };
+    }
+  }, [gameId, winner, gameStatus]);
+
+  const createGame = async () => {
+    try {
+      const response = await fetch('/api/game/create', {
+        method: 'POST',
+      });
+      const data = await response.json();
+      
       setGameId(data.game_id);
       setPlayerNumber(data.player_number);
       setGameStatus('waiting');
       setCurrentPlayer(data.current_player);
-    });
+      setBoard(Array(6).fill().map(() => Array(7).fill(null)));
+      
+      // Start waiting for opponent
+      const waitResponse = await fetch(`/api/game/${data.game_id}/wait_for_opponent`);
+      const waitData = await waitResponse.json();
+      
+      if (waitData.joined) {
+        console.log('Opponent joined!');
+        setGameStatus('playing');
+        setBoard(waitData.board);
+        setCurrentPlayer(waitData.current_player);
+      }
+    } catch (error) {
+      console.error('Error creating game:', error);
+    }
+  };
 
-    socket.on('game_joined', (data) => {
+  const handleJoinGame = async (e) => {
+    e.preventDefault();
+    if (!joinGameId) return;
+
+    try {
+      const response = await fetch(`/api/game/${joinGameId}/join`, {
+        method: 'POST',
+      });
+      const data = await response.json();
+      
+      if (data.error) {
+        alert(data.error);
+        return;
+      }
+
+      setGameId(joinGameId);
       setPlayerNumber(data.player_number);
       setGameStatus(data.player_number === 0 ? 'spectating' : 'playing');
       setBoard(data.board);
       setCurrentPlayer(data.current_player);
-    });
+    } catch (error) {
+      console.error('Error joining game:', error);
+    }
+  };
 
-    socket.on('player_joined', (data) => {
-      setGameStatus('playing');
-      setBoard(data.board);
-      setCurrentPlayer(data.current_player);
-    });
+  const handleClick = async (column) => {
+    if (winner || currentPlayer !== playerNumber) {
+      return;
+    }
 
-    socket.on('move_made', (data) => {
-      setBoard(data.board);
-      setCurrentPlayer(data.current_player);
+    try {
+      const response = await fetch(`/api/game/${gameId}/move`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          column: column,
+          player: playerNumber
+        }),
+      });
       
+      const data = await response.json();
+      
+      if (data.error) {
+        alert(data.error);
+        return;
+      }
+
       if (data.winner) {
         setWinner(data.winner);
         setWinningCells(data.winningCells);
       }
-    });
-
-    socket.on('error', (data) => {
-      alert(data.message);
-    });
-
-    return () => {
-      socket.off('game_created');
-      socket.off('game_joined');
-      socket.off('player_joined');
-      socket.off('move_made');
-      socket.off('error');
-    };
-  }, []);
-
-  useEffect(() => {
-    if (winner) {
-      setGameId(null);
-      setJoinGameId('');
+    } catch (error) {
+      console.error('Error making move:', error);
     }
-  }, [winner]);
-
-  const createGame = () => {
-    setBoard(Array(6).fill().map(() => Array(7).fill(null)));
-    setWinner(null);
-    setWinningCells([]);
-    socket.emit('create_game');
-  };
-
-  const handleJoinGame = (e) => {
-    e.preventDefault();
-    if (joinGameId) {
-      setBoard(Array(6).fill().map(() => Array(7).fill(null)));
-      setWinner(null);
-      setWinningCells([]);
-      setGameId(joinGameId);
-      socket.emit('join_game', { game_id: Number(joinGameId) });
-    }
-  };
-
-  const handleClick = (column) => {
-    if (winner || 
-        gameStatus !== 'playing' || 
-        currentPlayer !== playerNumber) {
-      return;
-    }
-    
-    socket.emit('make_move', {
-      game_id: Number(gameId),
-      column: column,
-      player: playerNumber
-    });
-  };
-
-  const resetGame = () => {
-    setBoard(Array(6).fill().map(() => Array(7).fill(null)));
-    setCurrentPlayer(1);
-    setWinner(null);
-    setWinningCells([]);
-    setGameStatus('waiting');
-  };
-
-  const handleWin = (winner) => {
-    setWinner(winner);
-    setShowButtons(true);
   };
 
   const renderCell = (row, col) => {
@@ -126,11 +156,6 @@ function Connect4() {
         key={`${row}-${col}`}
       />
     );
-  };
-
-  const handleNewGame = () => {
-    console.log("Requesting new game"); // Debug log
-    socket.emit('new_game');
   };
 
   return (

@@ -68,6 +68,11 @@ def serve_contact():
 def serve_blog():
     return send_file(os.path.join(app.static_folder, 'personal', 'blog.html'))
 
+@app.route('/dnd-battle-tracker')
+@app.route('/dnd-battle-tracker/')
+def serve_blog():
+    return send_file(os.path.join(app.static_folder, 'personal', 'dnd-tracker.html'))
+
 # Root path - serve personal index
 @app.route('/')
 def serve_root():
