@@ -65,10 +65,13 @@ def serve_contact():
 def serve_blog():
     return send_file(os.path.join(app.static_folder, 'personal', 'blog.html'))
 
-@app.route('/dnd-battle-tracker')
-@app.route('/dnd-battle-tracker/')
-def serve_dnd_tracker():
-    return send_file(os.path.join(app.static_folder, 'personal', 'dnd-tracker.html'))
+@app.route('/dnd-battle-tracker', defaults={'path': 'dnd-battle-tracker'})
+@app.route('/dnd-battle-tracker/', defaults={'path': 'dnd-battle-tracker'})
+@app.route('/<path:path>')
+def serve_dnd_tracker(path):
+    if path.lower().replace('/', '') in ['dnd-battle-tracker', 'nd-battle-tracker']:
+        return send_file(os.path.join(app.static_folder, 'personal', 'dnd-tracker.html'))
+    return serve_remaining(path)  # Fall through to the catch-all handler for other paths
 
 # Root path - serve personal index
 @app.route('/')
